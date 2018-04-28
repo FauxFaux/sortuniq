@@ -42,11 +42,10 @@ fn stable_uniq() {
 
     for line in stdin.lines() {
         let line = line.expect("read error in a line");
-        // TODO: This is probably inefficient; probably moves the new value into the map,
-        // TODO: and frees the old one. Maybe swap for `contains()`, or manual map.
-        if seen.insert(line.clone()) {
-            println!("{}", line)
+        if seen.contains(&line) {
+            continue;
         }
+        println!("{}", line);
+        seen.insert(line);
     }
-
 }
