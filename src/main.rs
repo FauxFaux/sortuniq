@@ -1,4 +1,5 @@
 extern crate clap;
+extern crate tempfile_fast;
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -7,13 +8,51 @@ use std::io::BufRead;
 
 fn main() {
     let args = clap::App::new("sortuniq")
-        .arg(clap::Arg::with_name("count").short("c"))
-        .arg(clap::Arg::with_name("local"))
+        .arg(clap::Arg::with_name("count").long("count").short("c"))
+        .arg(
+            clap::Arg::with_name("local")
+                .long("local")
+                .conflicts_with("count"),
+        )
         .get_matches();
-    if args.is_present("count") {
+    if args.is_present("local") {
+        local_uniq()
+    } else if args.is_present("count") {
         flat_count()
     } else {
         stable_uniq()
+    }
+}
+
+fn local_uniq() {
+    let stdin = io::stdin();
+    let stdin = stdin.lock();
+
+    let mut seen: [String; 8] = Default::default();
+    let mut lines = stdin.lines();
+
+    match lines.next() {
+        Some(Ok(line)) => {
+            println!("{}", line);
+            seen[0] = line;
+        }
+        Some(Err(e)) => panic!(e),
+        None => return,
+    }
+
+    let mut cursor = 1;
+
+    for line in lines {
+        let line = line.expect("read error in a line");
+        if seen.contains(&line) {
+            continue;
+        }
+        println!("{}", line);
+        seen[cursor] = line;
+        cursor += 1;
+        if seen.len() == cursor {
+            cursor = 0;
+        }
     }
 }
 

@@ -3,6 +3,9 @@ name = "sortuniq"
 version = "0.1.0"
 authors = ["Chris West (Faux) <git@goeswhere.com>"]
 
+[dependencies]
+tempfile-fast = "0.2"
+
 [dependencies.clap]
 version = "2.31"
 default-features = false
