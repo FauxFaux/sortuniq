@@ -58,7 +58,7 @@ fn local_uniq<R: BufRead, W: Write>(from: R, mut to: W, view_distance: usize) ->
 
     for line in from.lines() {
         let line = line?;
-        if let Some(()) = seen.get(&line) {
+        if seen.contains(&line) {
             continue;
         }
         writeln!(to, "{}", line)?;
