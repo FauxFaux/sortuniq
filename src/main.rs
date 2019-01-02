@@ -68,18 +68,32 @@ fn local_uniq<R: BufRead, W: Write>(from: R, mut to: W, view_distance: usize) ->
     Ok(())
 }
 
-fn flat_count<R: BufRead, W: Write>(from: R, mut to: W, size_hint: usize) -> io::Result<()> {
-    let mut count: HashMap<String, u64> = HashMap::with_capacity(size_hint);
+fn flat_count<R: BufRead, W: Write>(mut from: R, mut to: W, size_hint: usize) -> io::Result<()> {
+    let mut count: HashMap<Vec<u8>, u64> = HashMap::with_capacity(size_hint);
 
-    for line in from.lines() {
-        let line = line?;
-        *count.entry(line).or_insert(0) += 1;
+    let mut buf = Vec::with_capacity(4096);
+    loop {
+        from.read_until(b'\n', &mut buf)?;
+        if buf.is_empty() {
+            break;
+        }
+        assert_eq!(Some(b'\n'), buf.pop());
+
+        if let Some(val) = count.get_mut(&buf) {
+            *val += 1;
+        } else {
+            count.insert(buf.to_vec(), 0);
+        }
+
+        buf.clear();
     }
 
-    let mut vec: Vec<(String, u64)> = count.into_iter().collect();
+    let mut vec: Vec<(Vec<u8>, u64)> = count.into_iter().collect();
     vec.sort_by_key(|&(_, count)| count);
     for (line, count) in vec {
-        writeln!(to, "{:10} {}", count, line)?;
+        write!(to, "{:10} ", count)?;
+        to.write_all(&line)?;
+        writeln!(to)?;
     }
 
     Ok(())
