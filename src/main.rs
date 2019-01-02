@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use std::io;
 use std::io::BufRead;
 
-fn main() {
+fn main() -> io::Result<()> {
     let args = clap::App::new(clap::crate_name!())
         .version(clap::crate_version!())
         .arg(
@@ -28,7 +28,7 @@ fn main() {
     }
 }
 
-fn local_uniq() {
+fn local_uniq() -> io::Result<()> {
     let stdin = io::stdin();
     let stdin = stdin.lock();
 
@@ -40,14 +40,14 @@ fn local_uniq() {
             println!("{}", line);
             seen[0] = line;
         }
-        Some(Err(e)) => panic!(e),
-        None => return,
+        Some(Err(e)) => Err(e)?,
+        None => return Ok(()),
     }
 
     let mut cursor = 1;
 
     for line in lines {
-        let line = line.expect("read error in a line");
+        let line = line?;
         if seen.contains(&line) {
             continue;
         }
@@ -58,15 +58,17 @@ fn local_uniq() {
             cursor = 0;
         }
     }
+
+    Ok(())
 }
 
-fn flat_count() -> () {
+fn flat_count() -> io::Result<()> {
     let stdin = io::stdin();
     let stdin = stdin.lock();
     let mut count: HashMap<String, u64> = HashMap::with_capacity(10_000);
 
     for line in stdin.lines() {
-        let line = line.expect("read error in a line");
+        let line = line?;
         *count.entry(line).or_insert(0) += 1;
     }
 
@@ -75,20 +77,24 @@ fn flat_count() -> () {
     for (k, v) in vec {
         println!("{:10} {}", v, k);
     }
+
+    Ok(())
 }
 
-fn stable_uniq() {
+fn stable_uniq() -> io::Result<()> {
     let stdin = io::stdin();
     let stdin = stdin.lock();
 
     let mut seen = HashSet::with_capacity(10_000);
 
     for line in stdin.lines() {
-        let line = line.expect("read error in a line");
+        let line = line?;
         if seen.contains(&line) {
             continue;
         }
         println!("{}", line);
         seen.insert(line);
     }
+
+    Ok(())
 }
