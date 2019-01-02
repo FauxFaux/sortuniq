@@ -4,12 +4,19 @@ use std::io;
 use std::io::BufRead;
 
 fn main() {
-    let args = clap::App::new("sortuniq")
-        .arg(clap::Arg::with_name("count").long("count").short("c"))
+    let args = clap::App::new(clap::crate_name!())
+        .version(clap::crate_version!())
+        .arg(
+            clap::Arg::with_name("count")
+                .long("count")
+                .short("c")
+                .help("prefix lines by the number of occurrences"),
+        )
         .arg(
             clap::Arg::with_name("local")
                 .long("local")
-                .conflicts_with("count"),
+                .conflicts_with("count")
+                .help("filter out nearby repetitions"),
         )
         .get_matches();
     if args.is_present("local") {
