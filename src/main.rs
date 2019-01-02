@@ -32,31 +32,15 @@ fn local_uniq() -> io::Result<()> {
     let stdin = io::stdin();
     let stdin = stdin.lock();
 
-    let mut seen: [String; 8] = Default::default();
-    let mut lines = stdin.lines();
+    let mut seen = lru::LruCache::new(8);
 
-    match lines.next() {
-        Some(Ok(line)) => {
-            println!("{}", line);
-            seen[0] = line;
-        }
-        Some(Err(e)) => Err(e)?,
-        None => return Ok(()),
-    }
-
-    let mut cursor = 1;
-
-    for line in lines {
+    for line in stdin.lines() {
         let line = line?;
-        if seen.contains(&line) {
+        if let Some(()) = seen.get(&line) {
             continue;
         }
         println!("{}", line);
-        seen[cursor] = line;
-        cursor += 1;
-        if seen.len() == cursor {
-            cursor = 0;
-        }
+        seen.put(line, ());
     }
 
     Ok(())
