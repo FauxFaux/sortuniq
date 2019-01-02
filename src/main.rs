@@ -77,9 +77,9 @@ fn flat_count<R: BufRead, W: Write>(from: R, mut to: W, size_hint: usize) -> io:
     }
 
     let mut vec: Vec<(String, u64)> = count.into_iter().collect();
-    vec.sort_by_key(|&(_, v)| v);
-    for (k, v) in vec {
-        writeln!(to, "{:10} {}", v, k)?;
+    vec.sort_by_key(|&(_, count)| count);
+    for (line, count) in vec {
+        writeln!(to, "{:10} {}", count, line)?;
     }
 
     Ok(())
