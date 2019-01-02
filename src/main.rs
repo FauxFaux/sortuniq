@@ -4,6 +4,8 @@ use std::io;
 use std::io::BufRead;
 use std::io::Write;
 
+mod fixed_set;
+
 fn main() -> io::Result<()> {
     let args = clap::App::new(clap::crate_name!())
         .version(clap::crate_version!())
@@ -54,15 +56,15 @@ fn main() -> io::Result<()> {
 }
 
 fn local_uniq<R: BufRead, W: Write>(from: R, mut to: W, view_distance: usize) -> io::Result<()> {
-    let mut seen = lru::LruCache::new(view_distance);
+    let mut seen = fixed_set::FixedSet::new(view_distance);
 
     for line in from.lines() {
         let line = line?;
-        if let Some(()) = seen.get(&line) {
+        if seen.contains(&line) {
             continue;
         }
         writeln!(to, "{}", line)?;
-        seen.put(line, ());
+        seen.insert(line);
     }
 
     Ok(())

@@ -18,7 +18,6 @@ edition = "2018"
 repository = "FauxFaux/sortuniq"
 
 [dependencies]
-lru = "0.1"
 
 [dependencies.clap]
 version = "2"
