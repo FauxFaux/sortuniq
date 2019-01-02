@@ -1,5 +1,8 @@
 # sortuniq
 
+[![Build status](https://api.travis-ci.org/FauxFaux/sortuniq.png)](https://travis-ci.org/FauxFaux/sortuniq)
+[![](https://img.shields.io/crates/v/sortuniq.svg)](https://crates.io/crates/sortuniq)
+
 `sortuniq` provides optimised versions of various `| sort | uniq`
 constructions which are common in shell scripting. This construction
 finds all the unique lines in an input, regardless of the line order.

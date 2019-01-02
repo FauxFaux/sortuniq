@@ -1,9 +1,21 @@
 [package]
 name = "sortuniq"
 version = "0.1.0"
+
 authors = ["Chris West (Faux) <git@goeswhere.com>"]
+categories = [
+    "command-line-utilities",
+    "text-processing",
+]
+description = "Find or count unique values in an input stream"
+license = "MIT/Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/FauxFaux/sortuniq"
 
 edition = "2018"
+
+[badges.travis-ci]
+repository = "FauxFaux/sortuniq"
 
 [dependencies]
 lru = "0.1"
