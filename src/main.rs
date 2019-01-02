@@ -1,6 +1,3 @@
-extern crate clap;
-extern crate tempfile_fast;
-
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::io;

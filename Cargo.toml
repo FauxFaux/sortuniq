@@ -3,8 +3,9 @@ name = "sortuniq"
 version = "0.1.0"
 authors = ["Chris West (Faux) <git@goeswhere.com>"]
 
+edition = "2018"
+
 [dependencies]
-tempfile-fast = "0.2"
 
 [dependencies.clap]
 version = "2"
