@@ -12,7 +12,7 @@ license = "MIT/Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/FauxFaux/sortuniq"
 
-edition = "2018"
+edition = "2021"
 
 [badges.travis-ci]
 repository = "FauxFaux/sortuniq"

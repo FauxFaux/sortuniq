@@ -63,7 +63,7 @@ fn local_uniq<R: BufRead, W: Write>(
         if seen.contains(&line) {
             continue;
         }
-        writeln!(to, "{}", line)?;
+        writeln!(to, "{line}")?;
         seen.put(line, ());
     }
 
@@ -81,7 +81,7 @@ fn flat_count<R: BufRead, W: Write>(from: R, mut to: W, size_hint: usize) -> io:
     let mut vec: Vec<(String, u64)> = count.into_iter().collect();
     vec.sort_by_key(|&(_, count)| count);
     for (line, count) in vec {
-        writeln!(to, "{:10} {}", count, line)?;
+        writeln!(to, "{count:10} {line}")?;
     }
 
     Ok(())
@@ -95,7 +95,7 @@ fn stable_uniq<R: BufRead, W: Write>(from: R, mut to: W, size_hint: usize) -> io
         if seen.contains(&line) {
             continue;
         }
-        writeln!(to, "{}", line)?;
+        writeln!(to, "{line}")?;
         seen.insert(line);
     }
 
@@ -122,7 +122,7 @@ mod tests {
     #[test]
     fn local() {
         let one = "a\nb\nc\nd\n";
-        let two = format!("{0}{0}", one);
+        let two = format!("{one}{one}");
         for view_distance in 1..=3 {
             assert_eq!(two, run_local(two.as_bytes(), view_distance));
         }
