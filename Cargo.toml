@@ -21,8 +21,8 @@ repository = "FauxFaux/sortuniq"
 lru = "0.9"
 
 [dependencies.clap]
-version = "2"
-default-features = false
+version = "4"
+features = ["cargo"]
 
 [profile.release]
 lto = true

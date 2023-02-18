@@ -4,40 +4,36 @@ use std::io;
 use std::io::BufRead;
 use std::io::Write;
 use std::num::NonZeroUsize;
+use clap::ArgAction;
 
 fn main() -> io::Result<()> {
-    let args = clap::App::new(clap::crate_name!())
-        .version(clap::crate_version!())
+    let args = clap::command!()
         .arg(
-            clap::Arg::with_name("size-hint")
+            clap::Arg::new("size-hint")
                 .long("size-hint")
-                .short("s")
-                .takes_value(true)
-                .validator(|v| {
-                    v.parse::<usize>()
-                        .map(|_| ())
-                        .map_err(|e| format!("invalid number: {}", e))
-                })
+                .short('s')
+                .value_parser(clap::value_parser!(usize))
                 .help("how much space to pre-allocate"),
         )
         .arg(
-            clap::Arg::with_name("count")
+            clap::Arg::new("count")
                 .long("count")
-                .short("c")
+                .short('c')
+                .action(ArgAction::SetTrue)
                 .help("prefix lines by the number of occurrences"),
         )
         .arg(
-            clap::Arg::with_name("local")
+            clap::Arg::new("local")
                 .long("local")
                 .conflicts_with("count")
+                .action(ArgAction::SetTrue)
                 .help("filter out nearby repetitions"),
         )
         .get_matches();
 
     let size_hint = args
-        .value_of("size-hint")
-        .and_then(|v| v.parse().ok())
-        .and_then(NonZeroUsize::new);
+        .get_one::<usize>("size-hint")
+        .and_then(|v| NonZeroUsize::new(*v));
 
     let stdin = io::stdin();
     let stdin = stdin.lock();
@@ -45,10 +41,10 @@ fn main() -> io::Result<()> {
     let stdout = io::stdout();
     let stdout = stdout.lock();
 
-    if args.is_present("local") {
+    if args.get_flag("local") {
         let default = NonZeroUsize::new(32).expect("static constant");
         local_uniq(stdin, stdout, size_hint.unwrap_or(default))
-    } else if args.is_present("count") {
+    } else if args.get_flag("count") {
         flat_count(stdin, stdout, size_hint.map(|v| v.get()).unwrap_or(10_000))
     } else {
         stable_uniq(stdin, stdout, size_hint.map(|v| v.get()).unwrap_or(10_000))
