@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use std::io;
 use std::io::BufRead;
 use std::io::Write;
+use std::num::NonZeroUsize;
 
 fn main() -> io::Result<()> {
     let args = clap::App::new(clap::crate_name!())
@@ -36,7 +37,7 @@ fn main() -> io::Result<()> {
     let size_hint = args
         .value_of("size-hint")
         .and_then(|v| v.parse().ok())
-        .and_then(|v| if 0 != v { Some(v) } else { None });
+        .and_then(NonZeroUsize::new);
 
     let stdin = io::stdin();
     let stdin = stdin.lock();
@@ -45,15 +46,20 @@ fn main() -> io::Result<()> {
     let stdout = stdout.lock();
 
     if args.is_present("local") {
-        local_uniq(stdin, stdout, size_hint.unwrap_or(32))
+        let default = NonZeroUsize::new(32).expect("static constant");
+        local_uniq(stdin, stdout, size_hint.unwrap_or(default))
     } else if args.is_present("count") {
-        flat_count(stdin, stdout, size_hint.unwrap_or(10_000))
+        flat_count(stdin, stdout, size_hint.map(|v| v.get()).unwrap_or(10_000))
     } else {
-        stable_uniq(stdin, stdout, size_hint.unwrap_or(10_000))
+        stable_uniq(stdin, stdout, size_hint.map(|v| v.get()).unwrap_or(10_000))
     }
 }
 
-fn local_uniq<R: BufRead, W: Write>(from: R, mut to: W, view_distance: usize) -> io::Result<()> {
+fn local_uniq<R: BufRead, W: Write>(
+    from: R,
+    mut to: W,
+    view_distance: NonZeroUsize,
+) -> io::Result<()> {
     let mut seen = lru::LruCache::new(view_distance);
 
     for line in from.lines() {
@@ -103,11 +109,17 @@ fn stable_uniq<R: BufRead, W: Write>(from: R, mut to: W, size_hint: usize) -> io
 #[cfg(test)]
 mod tests {
     use std::io;
+    use std::num::NonZeroUsize;
 
     fn run_local(input: &[u8], view_distance: usize) -> String {
         let mut out = Vec::with_capacity(input.len() / 8);
         let input = io::Cursor::new(input);
-        super::local_uniq(input.clone(), &mut out, view_distance).unwrap();
+        super::local_uniq(
+            input.clone(),
+            &mut out,
+            NonZeroUsize::new(view_distance).expect("test input"),
+        )
+        .unwrap();
         String::from_utf8(out).unwrap()
     }
 
