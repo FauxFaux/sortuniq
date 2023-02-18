@@ -1,6 +1,5 @@
 # sortuniq
 
-[![Build status](https://api.travis-ci.org/FauxFaux/sortuniq.png)](https://travis-ci.org/FauxFaux/sortuniq)
 [![](https://img.shields.io/crates/v/sortuniq.svg)](https://crates.io/crates/sortuniq)
 
 `sortuniq` provides optimised versions of various `| sort | uniq`
